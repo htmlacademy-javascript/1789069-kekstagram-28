@@ -27,3 +27,8 @@ function getNumber(string) {
 function complementString(string, minLength, addedString) {
   return string.padStart(minLength, addedString);
 }
+
+checkStringLength('проверяемая строка', 18);
+isPalindrom('Лёша на полке клопа нашёл ');
+getNumber('1 кефир, 0.5 батона');
+complementString('q', 4, 'werty');
