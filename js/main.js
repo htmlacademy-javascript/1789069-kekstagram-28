@@ -61,19 +61,23 @@ const generatePhotoId = createRandomIdFromRangeGenerator(1, 25);
 const generatePhotoAddress = createRandomIdFromRangeGenerator(1, 25);
 const generateCommentId = createRandomIdFromRangeGenerator(1, 100);
 
+const createComment = () => ({
+  id: generateCommentId(),
+  avatar: `img/avatar-${getRandomInteger(1, 6)}.svg`,
+  message: getRandomArrayElement(COMMENTS_MESSAGES),
+  name: getRandomArrayElement(NAMES)
+});
+
 const createPhotoDescription = () => ({
   id: generatePhotoId(),
   url: `photos/${generatePhotoAddress()}.jpg`,
   description: getRandomArrayElement(PHOTO_DESCRIPTIONS),
   likes: getRandomInteger(15, 200),
-  comments: [{
-    id: generateCommentId(),
-    avatar: `img/avatar-${getRandomInteger(1, 6)}.svg`,
-    message: getRandomArrayElement(COMMENTS_MESSAGES),
-    name: getRandomArrayElement(NAMES)
-  }]
+  comments: Array.from({length: getRandomInteger(1, 5)}, createComment)
 });
 
 const similarPhotoDescriptions = Array.from({length: SIMILAR_PHOTO_DESCRIPTION_COUNT}, createPhotoDescription);
 
-similarPhotoDescriptions();
+/* eslint-disable */
+console.log(similarPhotoDescriptions);
+/* eslint-enable */
