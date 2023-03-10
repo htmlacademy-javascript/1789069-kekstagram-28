@@ -1,5 +1,4 @@
-import { getRandomInteger } from './util.js';
-import { getRandomArrayElement } from './util.js';
+import { getRandomInteger, getRandomArrayElement } from './util.js';
 
 const PHOTO_DESCRIPTIONS = [
   'Фотография популярной достопримечательности',
