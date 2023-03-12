@@ -9,6 +9,7 @@ const similarListFragment = document.createDocumentFragment();
 
 similarPhotos.forEach((photo) => {
   const photoElement = similarPhotoTemplate.cloneNode(true);
+  photoElement.querySelector('.picture').dataset.id = photo.id;
   photoElement.querySelector('.picture__img').src = photo.url;
   photoElement.querySelector('.picture__likes').textContent = photo.likes;
   photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
@@ -16,3 +17,5 @@ similarPhotos.forEach((photo) => {
 });
 
 similarListElement.append(similarListFragment);
+
+export {similarListElement, similarPhotos};
