@@ -82,7 +82,7 @@ export function setBigPictureData (dataPhoto) {
       maxCountComments += 1;
     }
 
-    if (parseInt(bigPictureCommentsCount.textContent, 10) > currentCountComments) {
+    if (parseInt(bigPictureCommentsCount.textContent, 10) > visibleCommentsCount) {
       for (let i = currentCountComments; i < maxCountComments; i++) {
         comments[i].classList.remove('hidden');
       }
