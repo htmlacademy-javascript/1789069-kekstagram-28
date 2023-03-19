@@ -39,12 +39,12 @@ export function closeBigPicture () {
 function showMoreComments () {
   let currentVisibleCommentsCount = Array.from(commentsList.children).filter((comment) => !comment.classList.contains('hidden')).length;
   let currentTotalCommentsCount = parseInt(bigPictureCommentsCount.textContent, 10);
-  let maxCount = 5;
-  if (maxCount + (currentTotalCommentsCount - maxCount) <= currentTotalCommentsCount) {
-    maxCount += currentTotalCommentsCount - maxCount;
+  let maxCurrentCommentsCount = 5;
+  if (maxCurrentCommentsCount + (currentTotalCommentsCount - maxCurrentCommentsCount) <= currentTotalCommentsCount) {
+    maxCurrentCommentsCount += currentTotalCommentsCount - maxCurrentCommentsCount;
   }
   if (currentTotalCommentsCount > currentVisibleCommentsCount) {
-    for (let i = currentVisibleCommentsCount; i < maxCount; i++) {
+    for (let i = currentVisibleCommentsCount; i < maxCurrentCommentsCount; i++) {
       commentsList.children[i].classList.remove('hidden');
     }
   }
