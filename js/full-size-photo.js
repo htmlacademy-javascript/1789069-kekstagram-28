@@ -3,6 +3,19 @@ import { isEscapeKey } from './util.js';
 const bigPicture = document.querySelector('.big-picture');
 const bigPictureClose = document.querySelector('.big-picture__cancel');
 
+const bigPictureImg = bigPicture.querySelector('.big-picture__img');
+const bigPictureLikes = bigPicture.querySelector('.likes-count');
+const bigPictureCommentsCount = bigPicture.querySelector('.comments-count');
+const bigPictureDescription = bigPicture.querySelector('.social__caption');
+
+const commentCount = bigPicture.querySelector('.social__comment-count');
+const commentLoader = bigPicture.querySelector('.comments-loader');
+
+const commentTemplate = document.querySelector('.social__comment');
+const commentsList = document.querySelector('.social__comments');
+
+const maxCountCommentsAtPage = 5;
+
 const onDocumentKeydown = (evt) => {
   if (isEscapeKey(evt)) {
     evt.preventDefault();
@@ -20,19 +33,31 @@ export function closeBigPicture () {
   bigPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
+  commentLoader.removeEventListener('click', showMoreComments);
+}
+
+function showMoreComments () {
+  let currentVisibleCommentsCount = Array.from(commentsList.children).filter((comment) => !comment.classList.contains('hidden')).length;
+  let currentTotalCommentsCount = parseInt(bigPictureCommentsCount.textContent, 10);
+  let maxCurrentCommentsCount = 5;
+  if (maxCurrentCommentsCount + (currentTotalCommentsCount - maxCurrentCommentsCount) <= currentTotalCommentsCount) {
+    maxCurrentCommentsCount += currentTotalCommentsCount - maxCurrentCommentsCount;
+  }
+  if (currentTotalCommentsCount > currentVisibleCommentsCount) {
+    for (let i = currentVisibleCommentsCount; i < maxCurrentCommentsCount; i++) {
+      commentsList.children[i].classList.remove('hidden');
+    }
+  }
+  currentVisibleCommentsCount = Array.from(commentsList.children).filter((comment) => !comment.classList.contains('hidden')).length;
+  currentTotalCommentsCount = parseInt(bigPictureCommentsCount.textContent, 10);
+  commentCount.innerHTML = `${currentVisibleCommentsCount} из <span class="comments-count">${currentTotalCommentsCount}</span> комментариев`;
+
+  if (currentVisibleCommentsCount === currentTotalCommentsCount) {
+    commentLoader.classList.add('hidden');
+  }
 }
 
 export function setBigPictureData (dataPhoto) {
-
-  const bigPictureImg = bigPicture.querySelector('.big-picture__img');
-  const bigPictureLikes = bigPicture.querySelector('.likes-count');
-  const bigPictureCommentsCount = bigPicture.querySelector('.comments-count');
-  const bigPictureDescription = bigPicture.querySelector('.social__caption');
-
-  const commentCount = bigPicture.querySelector('.social__comment-count');
-  const commentLoader = bigPicture.querySelector('.comments-loader');
-
-  let maxCountCommentsAtPage = 5;
   let currentCountCommentsAtPage = 0;
 
   bigPictureImg.querySelector('img').src = dataPhoto.url;
@@ -44,12 +69,14 @@ export function setBigPictureData (dataPhoto) {
   let totalCommentsCount = 0;
   totalCommentsCount = parseInt(bigPictureCommentsCount.textContent, 10);
 
-  const commentTemplate = document.querySelector('.social__comment');
-  const commentsList = document.querySelector('.social__comments');
   commentsList.innerHTML = '';
   let visibleCommentsCount = 0;
 
   dataPhoto.comments.forEach((comment) => {
+    if (commentLoader.classList.contains('hidden')) {
+      commentLoader.classList.remove('hidden');
+    }
+
     const commentElement = commentTemplate.cloneNode(true);
 
     commentElement.querySelector('.social__picture').src = comment.avatar;
@@ -69,22 +96,11 @@ export function setBigPictureData (dataPhoto) {
   visibleCommentsCount = Array.from(commentsList.children).filter((comment) => !comment.classList.contains('hidden')).length;
   commentCount.innerHTML = `${visibleCommentsCount} из <span class="comments-count">${totalCommentsCount}</span> комментариев`;
 
-  commentLoader.addEventListener('click', () => {
+  if (visibleCommentsCount === totalCommentsCount) {
+    commentLoader.classList.add('hidden');
+  }
 
-    if (maxCountCommentsAtPage + (totalCommentsCount - maxCountCommentsAtPage) <= totalCommentsCount) {
-      maxCountCommentsAtPage += totalCommentsCount - maxCountCommentsAtPage;
-    }
-
-    if (totalCommentsCount > visibleCommentsCount) {
-      for (let i = currentCountCommentsAtPage; i < maxCountCommentsAtPage; i++) {
-        commentsList.children[i].classList.remove('hidden');
-      }
-      currentCountCommentsAtPage += maxCountCommentsAtPage - currentCountCommentsAtPage;
-    }
-
-    visibleCommentsCount = Array.from(commentsList.children).filter((comment) => !comment.classList.contains('hidden')).length;
-    commentCount.innerHTML = `${visibleCommentsCount} из <span class="comments-count">${totalCommentsCount}</span> комментариев`;
-  });
+  commentLoader.addEventListener('click', showMoreComments);
 
   bigPictureClose.addEventListener('click', closeBigPicture);
 }
