@@ -1,19 +1,20 @@
 import { isEscapeKey } from './util.js';
+import { uploadForm } from './constants.js';
 
-const uploadForm = document.querySelector('.img-upload__form');
-const closeUploadForm = document.querySelector('.img-upload__cancel');
-const uploadOverlay = document.querySelector('.img-upload__overlay');
-export const uploadFormLabel = document.querySelector('.img-upload__label');
-export const uploadFile = document.querySelector('.img-upload__input');
+const HASHTAG_REGEXP = /^#[a-zа-яё0-9]{1,19}$/i;
 
-const hashtagsInput = document.querySelector('.text__hashtags');
-const commentInput = document.querySelector('.text__description');
+const closeUploadForm = uploadForm.querySelector('.img-upload__cancel');
+const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
+export const uploadFile = uploadForm.querySelector('.img-upload__input');
 
-const scaleControl = document.querySelector('.scale__control--value');
-const scaleControlSmaller = document.querySelector('.scale__control--smaller');
-const scaleControlBigger = document.querySelector('.scale__control--bigger');
+const hashtagsInput = uploadForm.querySelector('.text__hashtags');
+const commentInput = uploadForm.querySelector('.text__description');
 
-const imgUploadPreview = document.querySelector('.img-upload__preview');
+const scaleControl = uploadForm.querySelector('.scale__control--value');
+const scaleControlSmaller = uploadForm.querySelector('.scale__control--smaller');
+const scaleControlBigger = uploadForm.querySelector('.scale__control--bigger');
+
+const imgUploadPreview = uploadForm.querySelector('.img-upload__preview img');
 
 const pristine = new Pristine(uploadForm, {
   classTo: 'img-upload__field-wrapper',
@@ -22,13 +23,13 @@ const pristine = new Pristine(uploadForm, {
 
 pristine.addValidator(hashtagsInput, validateHashtagsFormat, 'Неверный формат хэш-тегов');
 pristine.addValidator(hashtagsInput, validateHashtagsLength, 'Количество хэш-тегов превышает 5');
-pristine.addValidator(hashtagsInput, validateHashtagsIdentity, 'Один и тот же хэш-тег не может быть использован дважды');
+pristine.addValidator(hashtagsInput, validateHashtagsDuplicate, 'Один и тот же хэш-тег не может быть использован дважды');
 pristine.addValidator(commentInput, validateComment, 'Максимальная длина - 140 символов');
 
-const sliderFieldset = document.querySelector('.img-upload__effect-level');
-const sliderElement = document.querySelector('.effect-level__slider');
-const imgEffect = Array.from(document.querySelectorAll('.effects__radio'));
-const imgEffectValue = document.querySelector('.effect-level__value');
+const sliderFieldset = uploadForm.querySelector('.img-upload__effect-level');
+const sliderElement = uploadForm.querySelector('.effect-level__slider');
+const imgEffects = Array.from(uploadForm.querySelectorAll('.effects__radio'));
+const imgEffectValue = uploadForm.querySelector('.effect-level__value');
 
 noUiSlider.create(sliderElement, {
   range: {
@@ -100,7 +101,7 @@ function createEffect (evt) {
           min: 0,
           max: 1,
         },
-        start: 0,
+        start: 1,
         step: 0.1
       });
       sliderElement.noUiSlider.on('update', () => {
@@ -114,7 +115,7 @@ function createEffect (evt) {
           min: 0,
           max: 1,
         },
-        start: 0,
+        start: 1,
         step: 0.1
       });
       sliderElement.noUiSlider.on('update', () => {
@@ -128,7 +129,7 @@ function createEffect (evt) {
           min: 1,
           max: 100,
         },
-        start: 1,
+        start: 100,
         step: 1
       });
       sliderElement.noUiSlider.on('update', () => {
@@ -142,7 +143,7 @@ function createEffect (evt) {
           min: 0,
           max: 3,
         },
-        start: 0,
+        start: 3,
         step: 0.1
       });
       sliderElement.noUiSlider.on('update', () => {
@@ -156,7 +157,7 @@ function createEffect (evt) {
           min: 1,
           max: 3,
         },
-        start: 0,
+        start: 3,
         step: 0.1
       });
       sliderElement.noUiSlider.on('update', () => {
@@ -183,7 +184,7 @@ function closeForm () {
   scaleControlSmaller.removeEventListener('click', setSmallerScale);
   scaleControlBigger.removeEventListener('click', setBiggerScale);
 
-  imgEffect.forEach((effect) => {
+  imgEffects.forEach((effect) => {
     effect.removeEventListener('click', createEffect);
   });
 
@@ -207,17 +208,16 @@ export function openUploadForm () {
   scaleControlBigger.addEventListener('click', setBiggerScale);
 
   sliderFieldset.classList.add('hidden');
-  imgEffect.forEach((effect) => {
+  imgEffects.forEach((effect) => {
     effect.addEventListener('click', createEffect);
   });
 }
 
 function validateHashtagsFormat (hashtags) {
-  const hashtagsArray = hashtags.trim().split(' ');
-  const regexp = /^#[a-zа-яё0-9]{1,19}$/i;
+  const hashtagsArray = hashtags.trim().split(' ').filter((hashtag) => hashtag.trim());
   let flag = true;
   hashtagsArray.forEach((hashtag) => {
-    if (!regexp.test(hashtag)) {
+    if (!HASHTAG_REGEXP.test(hashtag)) {
       flag = false;
     }
   });
@@ -228,12 +228,12 @@ function validateHashtagsFormat (hashtags) {
 }
 
 function validateHashtagsLength (hashtags) {
-  const hashtagsArray = hashtags.trim().split(' ');
+  const hashtagsArray = hashtags.trim().split(' ').filter((hashtag) => hashtag.trim());
   return hashtagsArray.length <= 5;
 }
 
-function validateHashtagsIdentity (hashtags) {
-  const hashtagsArray = hashtags.trim().split(' ');
+function validateHashtagsDuplicate (hashtags) {
+  const hashtagsArray = hashtags.trim().split(' ').filter((hashtag) => hashtag.trim());
   const set = new Set(hashtagsArray);
   let flag = true;
   if(set.size !== hashtagsArray.length) {
