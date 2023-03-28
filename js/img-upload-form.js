@@ -28,29 +28,40 @@ pristine.addValidator(commentInput, validateComment, 'Максимальная �
 
 const sliderFieldset = uploadForm.querySelector('.img-upload__effect-level');
 const sliderElement = uploadForm.querySelector('.effect-level__slider');
-const imgEffects = Array.from(uploadForm.querySelectorAll('.effects__radio'));
 const imgEffectValue = uploadForm.querySelector('.effect-level__value');
+const effectsList = uploadForm.querySelector('.effects__list');
 
-noUiSlider.create(sliderElement, {
-  range: {
-    min: 0,
-    max: 1
-  },
-  start: 0,
-  step: 0.1,
-  connect: 'lower',
-  format: {
-    to: function (value) {
-      if (Number.isInteger(value)) {
-        return value.toFixed(0);
-      }
-      return value.toFixed(1);
+let slider;
+
+function initialSlider () {
+  noUiSlider.create(sliderElement, {
+    range: {
+      min: 0,
+      max: 1
     },
-    from: function(value) {
-      return parseFloat(value);
+    start: 0,
+    step: 0.1,
+    connect: 'lower',
+    format: {
+      to: function (value) {
+        if (Number.isInteger(value)) {
+          return value.toFixed(0);
+        }
+        return value.toFixed(1);
+      },
+      from: function(value) {
+        return parseFloat(value);
+      }
     }
-  }
-});
+  });
+  sliderElement.noUiSlider.set(100);
+  sliderElement.noUiSlider.on('update', () => {
+    imgEffectValue.value = sliderElement.noUiSlider.get();
+    setEffect();
+  });
+
+  return sliderElement;
+}
 
 const onFormKeydown = (evt) => {
   if (isEscapeKey(evt)) {
@@ -85,8 +96,32 @@ function setSmallerScale () {
   imgUploadPreview.style.transform = `scale(${parseInt(scaleControl.value, 10) / 100})`;
 }
 
-function createEffect (evt) {
-  if (evt.target.value === 'none') {
+function setEffect () {
+  const effectValue = uploadOverlay.querySelector('.effects__radio:checked').value;
+  const rangeValue = Number(imgEffectValue.value);
+  let filter = effectValue;
+
+  switch (effectValue) {
+    case 'chrome':
+      filter = `grayscale(${rangeValue})`;
+      break;
+    case 'sepia':
+      filter = `sepia(${rangeValue})`;
+      break;
+    case 'marvin':
+      filter = `invert(${rangeValue}%)`;
+      break;
+    case 'phobos':
+      filter = `blur(${rangeValue * 3}px)`;
+      break;
+    case 'heat':
+      filter = `brightness(${rangeValue * 2 + 1})`;
+      break;
+    default:
+      break;
+  }
+
+  if (filter === 'none') {
     imgUploadPreview.style.filter = '';
     imgEffectValue.value = '';
     sliderFieldset.classList.add('hidden');
@@ -94,78 +129,38 @@ function createEffect (evt) {
     sliderFieldset.classList.remove('hidden');
   }
 
-  switch (evt.target.value) {
-    case 'chrome':
-      sliderElement.noUiSlider.updateOptions({
-        range: {
-          min: 0,
-          max: 1,
-        },
-        start: 1,
-        step: 0.1
-      });
-      sliderElement.noUiSlider.on('update', () => {
-        imgUploadPreview.style.filter = `grayscale(${sliderElement.noUiSlider.get()})`;
-        imgEffectValue.value = sliderElement.noUiSlider.get();
-      });
-      break;
-    case 'sepia':
-      sliderElement.noUiSlider.updateOptions({
-        range: {
-          min: 0,
-          max: 1,
-        },
-        start: 1,
-        step: 0.1
-      });
-      sliderElement.noUiSlider.on('update', () => {
-        imgUploadPreview.style.filter = `sepia(${sliderElement.noUiSlider.get()})`;
-        imgEffectValue.value = sliderElement.noUiSlider.get();
-      });
-      break;
-    case 'marvin':
-      sliderElement.noUiSlider.updateOptions({
-        range: {
-          min: 1,
-          max: 100,
-        },
-        start: 100,
-        step: 1
-      });
-      sliderElement.noUiSlider.on('update', () => {
-        imgUploadPreview.style.filter = `invert(${sliderElement.noUiSlider.get()}%)`;
-        imgEffectValue.value = sliderElement.noUiSlider.get();
-      });
-      break;
-    case 'phobos':
-      sliderElement.noUiSlider.updateOptions({
-        range: {
-          min: 0,
-          max: 3,
-        },
-        start: 3,
-        step: 0.1
-      });
-      sliderElement.noUiSlider.on('update', () => {
-        imgUploadPreview.style.filter = `blur(${sliderElement.noUiSlider.get()}px)`;
-        imgEffectValue.value = sliderElement.noUiSlider.get();
-      });
-      break;
-    case 'heat':
-      sliderElement.noUiSlider.updateOptions({
-        range: {
-          min: 1,
-          max: 3,
-        },
-        start: 3,
-        step: 0.1
-      });
-      sliderElement.noUiSlider.on('update', () => {
-        imgUploadPreview.style.filter = `brightness(${sliderElement.noUiSlider.get()})`;
-        imgEffectValue.value = sliderElement.noUiSlider.get();
-      });
-      break;
+  imgUploadPreview.style.filter = filter;
+}
+
+function onChangeEffect (evt) {
+  if (!slider) {
+    slider = initialSlider();
   }
+  if (evt.target.value === 'marvin') {
+    slider.noUiSlider.updateOptions({
+      range: {
+        min: 0,
+        max: 100
+      },
+      step: 1
+    });
+  } else {
+    slider.noUiSlider.updateOptions({
+      range: {
+        min: 0,
+        max: 1
+      },
+      step: 0.1
+    });
+  }
+
+  slider.noUiSlider.set(100);
+  if (evt.target.value === 'none') {
+    slider.noUiSlider.destroy();
+    slider = null;
+  }
+
+  setEffect();
 }
 
 function closeForm () {
@@ -184,9 +179,7 @@ function closeForm () {
   scaleControlSmaller.removeEventListener('click', setSmallerScale);
   scaleControlBigger.removeEventListener('click', setBiggerScale);
 
-  imgEffects.forEach((effect) => {
-    effect.removeEventListener('click', createEffect);
-  });
+  effectsList.removeEventListener('change', onChangeEffect);
 
   document.body.classList.remove('modal-open');
   document.body.removeEventListener('keydown', onFormKeydown);
@@ -207,10 +200,9 @@ export function openUploadForm () {
   scaleControlSmaller.addEventListener('click', setSmallerScale);
   scaleControlBigger.addEventListener('click', setBiggerScale);
 
-  sliderFieldset.classList.add('hidden');
-  imgEffects.forEach((effect) => {
-    effect.addEventListener('click', createEffect);
-  });
+  effectsList.addEventListener('change', onChangeEffect);
+
+  slider = initialSlider();
 }
 
 function validateHashtagsFormat (hashtags) {
