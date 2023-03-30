@@ -1,10 +1,25 @@
 import { isEscapeKey } from './util.js';
 import { uploadForm } from './constants.js';
+import { sendData } from './load.js';
 
 const HASHTAG_REGEXP = /^#[a-zа-яё0-9]{1,19}$/i;
 
+const SubmitButtonText = {
+  IDLE: 'Опубликовать',
+  SENDIND: 'Публикация...'
+};
+
+const successMessageTemplate = document.querySelector('#success').content.querySelector('.success');
+const successMessageElement = successMessageTemplate.cloneNode(true);
+const successMessageButton = successMessageElement.querySelector('.success__button');
+
+const errorMessageTemplate = document.querySelector('#error').content.querySelector('.error');
+const errorMessageElement = errorMessageTemplate.cloneNode(true);
+const errorMessageButton = errorMessageElement.querySelector('.error__button');
+
 const closeUploadForm = uploadForm.querySelector('.img-upload__cancel');
 const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
+const submitButton = uploadForm.querySelector('.img-upload__submit');
 export const uploadFile = uploadForm.querySelector('.img-upload__input');
 
 const hashtagsInput = uploadForm.querySelector('.text__hashtags');
@@ -63,6 +78,11 @@ function initialSlider () {
   return sliderElement;
 }
 
+function destroySlider () {
+  sliderElement.noUiSlider.destroy();
+  slider = null;
+}
+
 const onFormKeydown = (evt) => {
   if (isEscapeKey(evt)) {
     evt.preventDefault();
@@ -76,11 +96,83 @@ function cancelCloseForm (evt) {
   });
 }
 
-function validateForm (evt) {
-  if (!pristine.validate()) {
-    evt.preventDefault();
+function closeSuccessMessage () {
+  successMessageElement.remove();
+  document.body.removeEventListener('click', onClickSuccessMessageOutside);
+  document.body.removeEventListener('keydown', onSuccessMessageKeydown);
+}
+
+function onSuccessMessageKeydown (evt) {
+  if (isEscapeKey(evt)) {
+    closeSuccessMessage();
   }
 }
+
+function onClickSuccessMessageOutside (evt) {
+  if (!evt.target.closest('.success__inner')) {
+    closeSuccessMessage();
+  }
+}
+
+const showSuccessMessage = () => {
+  successMessageButton.addEventListener('click', closeSuccessMessage);
+  document.body.addEventListener('keydown', onSuccessMessageKeydown);
+  document.body.addEventListener('click', onClickSuccessMessageOutside);
+  document.body.append(successMessageElement);
+};
+
+function onErrorMessageKeydown (evt) {
+  if (isEscapeKey(evt)) {
+    closeErrorMessage();
+  }
+}
+
+function onClickErrorMessageOutside (evt) {
+  if (!evt.target.closest('.error__inner')) {
+    closeSuccessMessage();
+  }
+}
+
+function closeErrorMessage () {
+  errorMessageElement.remove();
+  document.body.removeEventListener('click', onClickErrorMessageOutside);
+  document.body.removeEventListener('keydown', onErrorMessageKeydown);
+}
+
+const showErrorMessage = () => {
+  errorMessageButton.addEventListener('click', closeErrorMessage);
+  document.body.addEventListener('keydown', onErrorMessageKeydown);
+  document.body.addEventListener('click', onClickErrorMessageOutside);
+  document.body.append(errorMessageElement);
+};
+
+const blockSubmitButton = () => {
+  submitButton.disabled = true;
+  submitButton.textContent = SubmitButtonText.SENDIND;
+};
+
+const unblockSubmitButton = () => {
+  submitButton.disabled = false;
+  submitButton.textContent = SubmitButtonText.IDLE;
+};
+
+export const setUploadFormSubmit = (onSuccess) => {
+  uploadForm.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+
+    const isValid = pristine.validate();
+    if (isValid) {
+      blockSubmitButton();
+      const formData = new FormData(evt.target);
+
+      sendData(formData)
+        .then(onSuccess)
+        .then(showSuccessMessage)
+        .catch(showErrorMessage)
+        .finally(unblockSubmitButton);
+    }
+  });
+};
 
 function setBiggerScale () {
   if (parseInt(scaleControl.value, 10) < 100) {
@@ -156,14 +248,13 @@ function onChangeEffect (evt) {
 
   slider.noUiSlider.set(100);
   if (evt.target.value === 'none') {
-    slider.noUiSlider.destroy();
-    slider = null;
+    destroySlider();
   }
 
   setEffect();
 }
 
-function closeForm () {
+export function closeForm () {
   uploadOverlay.classList.add('hidden');
 
   uploadForm.reset();
@@ -174,12 +265,14 @@ function closeForm () {
   hashtagsInput.removeEventListener('focus', cancelCloseForm);
   commentInput.removeEventListener('focus', cancelCloseForm);
 
-  uploadForm.removeEventListener('submit', validateForm);
-
   scaleControlSmaller.removeEventListener('click', setSmallerScale);
   scaleControlBigger.removeEventListener('click', setBiggerScale);
 
   effectsList.removeEventListener('change', onChangeEffect);
+
+  if (slider) {
+    destroySlider();
+  }
 
   document.body.classList.remove('modal-open');
   document.body.removeEventListener('keydown', onFormKeydown);
@@ -194,8 +287,6 @@ export function openUploadForm () {
   closeUploadForm.addEventListener('click', closeForm);
   hashtagsInput.addEventListener('focus', cancelCloseForm);
   commentInput.addEventListener('focus', cancelCloseForm);
-
-  uploadForm.addEventListener('submit', validateForm);
 
   scaleControlSmaller.addEventListener('click', setSmallerScale);
   scaleControlBigger.addEventListener('click', setBiggerScale);

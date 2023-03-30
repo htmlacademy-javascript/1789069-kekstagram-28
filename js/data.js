@@ -65,7 +65,7 @@ const createPhotoDescription = () => ({
   url: `photos/${generatePhotoAddress()}.jpg`,
   description: getRandomArrayElement(PHOTO_DESCRIPTIONS),
   likes: getRandomInteger(15, 200),
-  comments: Array.from({length: getRandomInteger(1, 10)}, createComment)
+  comments: Array.from({length: getRandomInteger(1, 20)}, createComment)
 });
 
 export const createSimilarPhotoDescriptions = () => Array.from({length: SIMILAR_PHOTO_DESCRIPTION_COUNT}, createPhotoDescription);
