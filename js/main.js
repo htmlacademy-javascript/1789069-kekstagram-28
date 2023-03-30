@@ -1,23 +1,16 @@
-import { createSimilarPhoto } from './photos.js';
-import { similarListElement, similarPhotos } from './constants.js';
-import { setBigPictureData, openBigPicture } from './full-size-photo.js';
-import { openUploadForm, uploadFormLabel, uploadFile } from './img-upload-form.js';
+import { openUploadForm, uploadFile, setUploadFormSubmit, closeForm } from './img-upload-form.js';
+import { getData } from './load.js';
+import { renderPhotos } from './photos.js';
+import { showAlert } from './util.js';
 
-const similarListFragment = document.createDocumentFragment();
+getData()
+  .then((photos) => {
+    renderPhotos(photos);
+  })
+  .catch((err) => {
+    showAlert(err.message);
+  });
 
-function handleOpenPopup(dataPhoto) {
-  setBigPictureData(dataPhoto);
-  openBigPicture();
-}
 
-function handleOpenUploadForm () {
-  uploadFile.addEventListener('change', openUploadForm);
-}
-
-similarPhotos.forEach((photo) => {
-  similarListFragment.append(createSimilarPhoto(photo, handleOpenPopup));
-});
-
-similarListElement.append(similarListFragment);
-
-uploadFormLabel.addEventListener('click', handleOpenUploadForm);
+uploadFile.addEventListener('change', openUploadForm);
+setUploadFormSubmit(closeForm);
