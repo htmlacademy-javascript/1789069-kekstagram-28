@@ -3,12 +3,20 @@ import { similarListElement } from './constants.js';
 
 const similarPhotoTemplate = document.querySelector('#picture').content.querySelector('.picture');
 
+const imgFilters = document.querySelector('.img-filters');
+const imgFiltersButtons = document.querySelectorAll('.img-filters__button');
+
 export function handleOpenPopup(dataPhoto) {
   setBigPictureData(dataPhoto);
   openBigPicture();
 }
 
-export const renderPhotos = (photos) => {
+export const renderPhotos = (photos, currentFilter = null) => {
+
+  document.querySelectorAll('.picture').forEach((picture) => {
+    picture.remove();
+  });
+
   const similarListFragment = document.createDocumentFragment();
 
   photos.forEach((photo) => {
@@ -16,6 +24,17 @@ export const renderPhotos = (photos) => {
   });
 
   similarListElement.append(similarListFragment);
+
+  imgFilters.classList.remove('img-filters--inactive');
+
+  if (currentFilter) {
+    imgFiltersButtons.forEach((button) => {
+      button.classList.remove('img-filters__button--active');
+      if (button === currentFilter) {
+        button.classList.add('img-filters__button--active');
+      }
+    });
+  }
 };
 
 export function createSimilarPhoto(dataPhoto) {

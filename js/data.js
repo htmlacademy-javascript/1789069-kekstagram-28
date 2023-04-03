@@ -33,7 +33,7 @@ const NAMES = [
 
 const SIMILAR_PHOTO_DESCRIPTION_COUNT = 25;
 
-const createRandomIdFromRangeGenerator = (min, max) => {
+export const createRandomIdFromRangeGenerator = (min, max) => {
   const previousValues = [];
 
   return function () {
