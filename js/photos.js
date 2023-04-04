@@ -1,7 +1,5 @@
 import { setBigPictureData, openBigPicture } from './full-size-photo.js';
-import { similarListElement } from './constants.js';
-
-const similarPhotoTemplate = document.querySelector('#picture').content.querySelector('.picture');
+import { similarListElement, similarPhotoTemplate } from './constants.js';
 
 const imgFilters = document.querySelector('.img-filters');
 const imgFiltersButtons = document.querySelectorAll('.img-filters__button');
