@@ -1,6 +1,7 @@
 import { isEscapeKey } from './util.js';
-import { uploadForm } from './constants.js';
+import { uploadForm, successMessageTemplate } from './constants.js';
 import { sendData } from './load.js';
+import { setPreviewImage } from './preview-image.js';
 
 const HASHTAG_REGEXP = /^#[a-zа-яё0-9]{1,19}$/i;
 
@@ -9,7 +10,6 @@ const SubmitButtonText = {
   SENDIND: 'Публикация...'
 };
 
-const successMessageTemplate = document.querySelector('#success').content.querySelector('.success');
 const successMessageElement = successMessageTemplate.cloneNode(true);
 const successMessageButton = successMessageElement.querySelector('.success__button');
 
@@ -29,7 +29,7 @@ const scaleControl = uploadForm.querySelector('.scale__control--value');
 const scaleControlSmaller = uploadForm.querySelector('.scale__control--smaller');
 const scaleControlBigger = uploadForm.querySelector('.scale__control--bigger');
 
-const imgUploadPreview = uploadForm.querySelector('.img-upload__preview img');
+export const imgUploadPreview = uploadForm.querySelector('.img-upload__preview img');
 
 const pristine = new Pristine(uploadForm, {
   classTo: 'img-upload__field-wrapper',
@@ -129,7 +129,7 @@ function onErrorMessageKeydown (evt) {
 
 function onClickErrorMessageOutside (evt) {
   if (!evt.target.closest('.error__inner')) {
-    closeSuccessMessage();
+    closeErrorMessage();
   }
 }
 
@@ -283,6 +283,8 @@ export function openUploadForm () {
   document.body.classList.add('modal-open');
 
   uploadOverlay.classList.remove('hidden');
+
+  setPreviewImage();
 
   closeUploadForm.addEventListener('click', closeForm);
   hashtagsInput.addEventListener('focus', cancelCloseForm);
