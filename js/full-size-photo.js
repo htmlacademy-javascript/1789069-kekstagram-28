@@ -1,7 +1,5 @@
 import { isEscapeKey } from './util.js';
-import { bigPicture } from './constants.js';
-
-const MAX_COUNT_COMMENTS_AT_PAGE = 5;
+import { bigPicture, MAX_COUNT_COMMENTS_AT_PAGE } from './constants.js';
 
 const bigPictureClose = bigPicture.querySelector('.big-picture__cancel');
 
@@ -16,39 +14,19 @@ const commentLoader = bigPicture.querySelector('.comments-loader');
 const commentTemplate = bigPicture.querySelector('.social__comment');
 const commentsList = bigPicture.querySelector('.social__comments');
 
-let maxCurrentCommentsCount = 5;
+let maxCurrentCommentsCount = MAX_COUNT_COMMENTS_AT_PAGE;
 
-const onDocumentKeydown = (evt) => {
-  if (isEscapeKey(evt)) {
-    evt.preventDefault();
-    closeBigPicture();
-  }
-};
-
-export function openBigPicture () {
-  bigPicture.classList.remove('hidden');
-  document.body.classList.add('modal-open');
-  document.addEventListener('keydown', onDocumentKeydown);
-}
-
-export function closeBigPicture () {
-  bigPicture.classList.add('hidden');
-  document.body.classList.remove('modal-open');
-  document.removeEventListener('keydown', onDocumentKeydown);
-  commentLoader.removeEventListener('click', showMoreComments);
-  maxCurrentCommentsCount = 5;
-}
-
-function showMoreComments () {
+const showMoreComments = () => {
   let currentVisibleCommentsCount = Array.from(commentsList.children).filter((comment) => !comment.classList.contains('hidden')).length;
   let currentTotalCommentsCount = parseInt(bigPictureCommentsCount.textContent, 10);
 
-  maxCurrentCommentsCount += 5;
+  maxCurrentCommentsCount += MAX_COUNT_COMMENTS_AT_PAGE;
   if (currentTotalCommentsCount > currentVisibleCommentsCount) {
     for (let i = currentVisibleCommentsCount; i < maxCurrentCommentsCount; i++) {
-      if (typeof commentsList.children[i] !== 'undefined') {
-        commentsList.children[i].classList.remove('hidden');
+      if (typeof commentsList.children[i] === 'undefined') {
+        break;
       }
+      commentsList.children[i].classList.remove('hidden');
     }
   }
   currentVisibleCommentsCount = Array.from(commentsList.children).filter((comment) => !comment.classList.contains('hidden')).length;
@@ -58,9 +36,30 @@ function showMoreComments () {
   if (currentVisibleCommentsCount === currentTotalCommentsCount) {
     commentLoader.classList.add('hidden');
   }
+};
+
+export const openBigPicture = () => {
+  bigPicture.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+  document.addEventListener('keydown', onDocumentKeydown);
+};
+
+export const closeBigPicture = () => {
+  bigPicture.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+  document.removeEventListener('keydown', onDocumentKeydown);
+  commentLoader.removeEventListener('click', showMoreComments);
+  maxCurrentCommentsCount = MAX_COUNT_COMMENTS_AT_PAGE;
+};
+
+function onDocumentKeydown (evt) {
+  if (isEscapeKey(evt)) {
+    evt.preventDefault();
+    closeBigPicture();
+  }
 }
 
-export function setBigPictureData (dataPhoto) {
+export const setBigPictureData = (dataPhoto) => {
   let currentCountCommentsAtPage = 0;
 
   bigPictureImg.querySelector('img').src = dataPhoto.url;
@@ -106,4 +105,4 @@ export function setBigPictureData (dataPhoto) {
   commentLoader.addEventListener('click', showMoreComments);
 
   bigPictureClose.addEventListener('click', closeBigPicture);
-}
+};

@@ -1,9 +1,6 @@
-import { uploadFile, imgUploadPreview } from './img-upload-form.js';
+import { uploadFile, imgUploadPreview, FILE_TYPES } from './constants.js';
 
-const FILE_TYPES = ['jpg', 'jpeg', 'png'];
-
-
-export function setPreviewImage () {
+export const setPreviewImage = () => {
   const file = uploadFile.files[0];
   const fileName = file.name.toLowerCase();
 
@@ -12,4 +9,4 @@ export function setPreviewImage () {
   if (matches) {
     imgUploadPreview.src = URL.createObjectURL(file);
   }
-}
+};

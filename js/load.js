@@ -1,17 +1,4 @@
-const Route = {
-  GET_DATA: 'https://28.javascript.pages.academy/kekstagram/data',
-  SEND_DATA: 'https://28.javascript.pages.academy/kekstagram'
-};
-
-const Method = {
-  GET: 'GET',
-  POST: 'POST'
-};
-
-const ErrorText = {
-  GET_DATA: 'Не удалось загрузить данные. Попробуйте обновить страницу',
-  SEND_DATA: 'Не удалось отправить форму. Попробуйте ещё раз'
-};
+import { Route, Method, ErrorText } from './constants.js';
 
 const load = (route, errorText, method = Method.GET, body = null) =>
   fetch(`${route}`, {method, body})
