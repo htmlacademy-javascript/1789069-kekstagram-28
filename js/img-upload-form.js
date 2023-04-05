@@ -44,10 +44,10 @@ const setEffect = () => {
       filter = `invert(${rangeValue}%)`;
       break;
     case 'phobos':
-      filter = `blur(${rangeValue * 3}px)`;
+      filter = `blur(${rangeValue}px)`;
       break;
     case 'heat':
-      filter = `brightness(${rangeValue * 2 + 1})`;
+      filter = `brightness(${rangeValue})`;
       break;
     default:
       break;
@@ -110,6 +110,22 @@ const onChangeEffect = (evt) => {
         max: 100
       },
       step: 1
+    });
+  } else if (evt.target.value === 'phobos') {
+    slider.noUiSlider.updateOptions({
+      range: {
+        min: 0,
+        max: 3
+      },
+      step: 0.1
+    });
+  } else if (evt.target.value === 'heat') {
+    slider.noUiSlider.updateOptions({
+      range: {
+        min: 1,
+        max: 3
+      },
+      step: 0.1
     });
   } else {
     slider.noUiSlider.updateOptions({
