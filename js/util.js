@@ -6,8 +6,6 @@ export const getRandomInteger = (min, max) => {
   return Math.floor(result);
 };
 
-export const getRandomArrayElement = (elements) => elements[getRandomInteger(0, elements.length - 1)];
-
 export const isEscapeKey = (evt) => evt.key === 'Escape';
 
 export const showAlert = (message) => {
