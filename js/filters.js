@@ -49,6 +49,7 @@ export const setFilter = (elements) => {
         break;
       case filterDefault:
         filter = debounce(defaultFilter(elements), RERENDER_DELAY);
+        filter();
         break;
       default:
         break;
