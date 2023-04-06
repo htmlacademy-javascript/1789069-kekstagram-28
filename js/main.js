@@ -2,15 +2,16 @@ import { openUploadForm, setUploadFormSubmit, closeForm } from './img-upload-for
 import { getData } from './load.js';
 import { renderPhotos } from './photos.js';
 import { showAlert } from './util.js';
-import { setRandomFilter, setDiscussedFilter, setDefaultFilter } from './filters.js';
-import { COUNT_RANDOM_PHOTO, uploadFile } from './constants.js';
+import { setFilter } from './filters.js';
+import { uploadFile } from './constants.js';
 
 getData()
   .then((photos) => {
     renderPhotos(photos);
-    setRandomFilter(photos, COUNT_RANDOM_PHOTO);
+    /* setRandomFilter(photos, COUNT_RANDOM_PHOTO);
     setDiscussedFilter(photos);
-    setDefaultFilter(photos);
+    setDefaultFilter(photos); */
+    setFilter(photos);
   })
   .catch((err) => {
     showAlert(err.message);

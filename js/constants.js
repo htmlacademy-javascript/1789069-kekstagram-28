@@ -26,6 +26,12 @@ export const ErrorText = {
   SEND_DATA: 'Не удалось отправить форму. Попробуйте ещё раз'
 };
 
+export const Scale = {
+  MIN: 25,
+  MAX: 100,
+  STEP: 25
+};
+
 export const similarListElement = document.querySelector('.pictures');
 export const bigPicture = document.querySelector('.big-picture');
 
