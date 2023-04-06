@@ -1,6 +1,6 @@
 import { isEscapeKey } from './util.js';
 import { uploadForm, successMessageTemplate, errorMessageTemplate, hashtagsInput, commentInput,
-  imgUploadPreview, SubmitButtonText } from './constants.js';
+  imgUploadPreview, SubmitButtonText, Scale } from './constants.js';
 import { sendData } from './load.js';
 import { setPreviewImage } from './preview-image.js';
 import { pristine } from './validate.js';
@@ -239,15 +239,15 @@ export const setUploadFormSubmit = (onSuccess) => {
 };
 
 const setBiggerScale = () => {
-  if (parseInt(scaleControl.value, 10) < 100) {
-    scaleControl.value = `${parseInt(scaleControl.value, 10) + 25}%`;
+  if (parseInt(scaleControl.value, 10) < Scale.MAX) {
+    scaleControl.value = `${parseInt(scaleControl.value, 10) + Scale.STEP}%`;
   }
   imgUploadPreview.style.transform = `scale(${parseInt(scaleControl.value, 10) / 100})`;
 };
 
 const setSmallerScale = () => {
-  if (parseInt(scaleControl.value, 10) > 25) {
-    scaleControl.value = `${parseInt(scaleControl.value, 10) - 25}%`;
+  if (parseInt(scaleControl.value, 10) > Scale.MIN) {
+    scaleControl.value = `${parseInt(scaleControl.value, 10) - Scale.STEP}%`;
   }
   imgUploadPreview.style.transform = `scale(${parseInt(scaleControl.value, 10) / 100})`;
 };
