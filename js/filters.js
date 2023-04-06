@@ -18,13 +18,13 @@ const sortByCommentsDecrease = (photo1, photo2) => photo2.comments.length - phot
 
 const randomFilter = (elements, count) => () => {
   const generateElementId = createRandomIdFromRangeGenerator(0, elements.length - 1);
-  const elementsCopy = Array.from({ length: count }, () => elements[generateElementId()]);
-  renderPhotos(elementsCopy);
+  const filteredElements = Array.from({ length: count }, () => elements[generateElementId()]);
+  renderPhotos(filteredElements);
 };
 
 const discussedFilter = (elements) => () => {
-  const elementsCopy = elements.slice(0).sort(sortByCommentsDecrease);
-  renderPhotos(elementsCopy);
+  const filteredElements = elements.slice(0).sort(sortByCommentsDecrease);
+  renderPhotos(filteredElements);
 };
 
 const defaultFilter = (elements) => () => {
