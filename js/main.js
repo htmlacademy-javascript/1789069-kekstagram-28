@@ -8,9 +8,6 @@ import { uploadFile } from './constants.js';
 getData()
   .then((photos) => {
     renderPhotos(photos);
-    /* setRandomFilter(photos, COUNT_RANDOM_PHOTO);
-    setDiscussedFilter(photos);
-    setDefaultFilter(photos); */
     setFilter(photos);
   })
   .catch((err) => {
