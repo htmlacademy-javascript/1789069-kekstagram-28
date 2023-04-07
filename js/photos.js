@@ -1,7 +1,12 @@
 import { setBigPictureData, openBigPicture } from './full-size-photo.js';
-import { similarListElement, similarPhotoTemplate } from './constants.js';
+import { similarListElement, similarPhotoTemplate, COUNT_RANDOM_PHOTO } from './constants.js';
+import { randomFilter, discussedFilter, defaultFilter } from './filters.js';
 
 const imgFilters = document.querySelector('.img-filters');
+
+const filterDefault = document.querySelector('#filter-default');
+const filterRandom = document.querySelector('#filter-random');
+const filterDiscussed = document.querySelector('#filter-discussed');
 
 export const handleOpenPopup = (dataPhoto) => {
   setBigPictureData(dataPhoto);
@@ -23,7 +28,7 @@ export const createSimilarPhoto = (dataPhoto) => {
   return photoElement;
 };
 
-export const renderPhotos = (photos) => {
+export const renderPhotos = (photos, filter = null) => {
 
   document.querySelectorAll('.picture').forEach((picture) => {
     picture.remove();
@@ -31,6 +36,21 @@ export const renderPhotos = (photos) => {
 
   const similarListFragment = document.createDocumentFragment();
 
+  if (filter) {
+    switch (filter) {
+      case filterRandom:
+        photos = randomFilter(photos, COUNT_RANDOM_PHOTO);
+        break;
+      case filterDiscussed:
+        photos = discussedFilter(photos);
+        break;
+      case filterDefault:
+        photos = defaultFilter(photos);
+        break;
+      default:
+        break;
+    }
+  }
   photos.forEach((photo) => {
     similarListFragment.append(createSimilarPhoto(photo, handleOpenPopup));
   });
